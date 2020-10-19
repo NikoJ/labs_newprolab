@@ -4,13 +4,10 @@ import sys
 import happybase
 
 def emit(uid, ts, url):
-    sys.stdout.write('{}\t{}\t{}\n'.format(uid, ts, url))
+    sys.stdout.write('{}\t{}\t{}\n'.format(uid, str(ts), url)) # for check on hdfs
     connect = happybase.Connection('bd-node2.newprolab.com')
-    table = connection.table('nikolay.potapov')
-    uid_s = str(uid)
-    ts_s = int(ts_s)
-    url_s = str(url_s)
-    table.put(uid_s,{'data:url':url}, timestamp = ts)
+    table = connect.table('nikolay.potapov')
+    table.put(uid, {'data:url':url}, ts)
 
 def map(line):
     objects = line.split("\t")
@@ -22,7 +19,7 @@ def map(line):
         return None
     if timestamp is None or len(timestamp) < 5 or is_float(timestamp) is False:
         return None
-    if url is None or len(url) < 1 or str(url).lower().startswith('http') is False:
+    if url is None or len(url) < 5 or str(url).lower().startswith('http') is False:
         return None
     # check uid
     if int(uid) % 256 != 154:
